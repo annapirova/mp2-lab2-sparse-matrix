@@ -100,18 +100,6 @@ public:
 
         return *this;
     }
-
-    bool operator==(const CSR_matrix& other) const {
-        if (n_rows != other.n_rows || n_cols != other.n_cols || nz != other.nz)
-            return false;
-        for (size_t i = 0; i <= n_rows; ++i)
-            if (RowIndex[i] != other.RowIndex[i])
-                return false;
-        for (size_t j = 0; j < nz; ++j)
-            if (Col[j] != other.Col[j] || Val[j] != other.Val[j])
-                return false;
-        return true;
-    }
     
     // вектора cols, rows, vals содержат корректное описание матрицы в формате CSR
     void set_from_vectors(const std::vector<size_t>& cols, const std::vector<size_t>& rows, 
@@ -219,6 +207,9 @@ public:
 	CSR_matrix transpose() const;
 	// конвертер из координатного формата в формат CSR
 	CSR_matrix from_coo(size_t n_rows, size_t n_cols, const std::vector<size_t>& rows, const std::vector<size_t>& cols, const std::vector<ValT>& vals);
+	
+	// подумайте, как реализовать корректно для разных типов данных ValT
+    bool operator==(const CSR_matrix& other) const;
 };
 
 
