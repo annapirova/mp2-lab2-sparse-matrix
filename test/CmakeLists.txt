@@ -1,0 +1,10 @@
+#file(GLOB TEST_SOURCES "*.cpp")
+
+set(TEST_SOURCES test_csr.cpp)
+
+add_executable(sparse_tests ${TEST_SOURCES})
+
+target_link_libraries(sparse_tests PRIVATE gtest gtest_main sparse_matrix)
+
+include(GoogleTest)
+gtest_discover_tests(sparse_tests DISCOVERY_MODE PRE_TEST)

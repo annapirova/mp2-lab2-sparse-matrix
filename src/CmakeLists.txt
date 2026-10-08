@@ -1,0 +1,6 @@
+file(GLOB APP_SOURCES "*.cpp")
+
+if(APP_SOURCES)
+    add_executable(sparse_main ${APP_SOURCES})    
+    target_link_libraries(sparse_main PRIVATE sparse_matrix)
+endif()
