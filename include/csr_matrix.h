@@ -15,25 +15,35 @@ public:
     size_t* Col = nullptr;
     ValT* Val = nullptr;
 
-    CSR_matrix(size_t _m = 1, size_t _n = 1) : n_rows(_m), n_cols(_n) {
-        RowIndex = new size_t[n_rows + 1];
+    CSR_matrix(size_t _m = 1, size_t _n = 1) : n_rows(_m), n_cols(_n), Col(nullptr), Val(nullptr) {
+        RowIndex = new size_t[n_rows + 1]();
     }
 
     CSR_matrix(size_t _m, size_t _n, size_t _nz) : n_rows(_m), n_cols(_n), nz(_nz) {
-        RowIndex = new size_t[n_rows + 1];
-        Col = new size_t[nz];
-        Val = new ValT[nz]();
+        RowIndex = new size_t[n_rows + 1] ();
+        if (nz > 0) {
+            Col = new size_t[nz];
+            Val = new ValT[nz]();
+        }
+        else {
+			Col = nullptr;
+			Val = nullptr;
+        }
         capacity = nz;
     }
 
     CSR_matrix(const CSR_matrix& copy) : n_rows(copy.n_rows), n_cols(copy.n_cols), nz(copy.nz), capacity(copy.capacity) {
-        Col = new size_t[nz];
-        memcpy(Col, copy.Col, nz * sizeof(size_t));
         RowIndex = new size_t[n_rows + 1];
-        memcpy(RowIndex, copy.RowIndex, (n_rows + 1) * sizeof(size_t));
-        if (copy.Val != nullptr) {
+        std::copy(copy.RowIndex, copy.RowIndex + n_rows + 1, RowIndex);
+        if (copy.nz > 0 && copy.Col != nullptr && copy.Val != nullptr) {
             Val = new ValT[nz];
-            memcpy(Val, copy.Val, nz * sizeof(ValT));
+            std::copy(copy.Val, copy.Val + nz, Val);
+            Col = new size_t[nz];
+            std::copy(copy.Col, copy.Col + nz, Col);
+        }
+        else {
+            Val = nullptr;
+			Col = nullptr;
         }
     }
 
@@ -61,7 +71,7 @@ public:
             delete[] RowIndex;
             RowIndex = new size_t[copy.n_rows + 1];
         }
-        memcpy(RowIndex, copy.RowIndex, (copy.n_rows + 1) * sizeof(size_t));
+        std::copy(copy.RowIndex, copy.RowIndex + copy.n_rows + 1, RowIndex);
         if (capacity < copy.nz) {
             delete[] Col;
             delete[] Val;
@@ -70,8 +80,8 @@ public:
             Val = new ValT[copy.nz];
             capacity = copy.nz;
         }
-        memcpy(Col, copy.Col, copy.nz * sizeof(size_t));
-        memcpy(Val, copy.Val, copy.nz * sizeof(ValT));
+        std::copy(copy.Col, copy.Col + copy.nz, Col);
+        std::copy(copy.Val, copy.Val + copy.nz, Val);
 
         n_rows = copy.n_rows;
         n_cols = copy.n_cols;
@@ -84,19 +94,13 @@ public:
         if (this == &mov)
             return *this;
 
-        Col = mov.Col;
-        RowIndex = mov.RowIndex;
-        Val = mov.Val;
-
-        mov.Col = nullptr;
-        mov.RowIndex = nullptr;
-        mov.Val = nullptr;
-
-        n_rows = mov.n_rows;
-        n_cols = mov.n_cols;
-        nz = mov.nz;
-        capacity = mov.capacity;
-
+		std::swap(Col, mov.Col);
+		std::swap(RowIndex, mov.RowIndex);
+		std::swap(Val, mov.Val);
+		std::swap(n_rows, mov.n_rows);
+		std::swap(n_cols, mov.n_cols);
+		std::swap(nz, mov.nz);
+		std::swap(capacity, mov.capacity);
 
         return *this;
     }
